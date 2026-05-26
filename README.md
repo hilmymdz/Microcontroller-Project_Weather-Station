@@ -5,5 +5,5 @@ Project ini merupakan proyek **Ujian Akhir Semester (UAS) Sistem Mikrokontroler*
 ---
 
 ## Anggota
-* Kelompok 9 - TIF RP 23 CID A
+* **Kelompok 9 - TIF RP 23 CID A
   * Hilmy Muhamad Dzakwan - 23552011368
