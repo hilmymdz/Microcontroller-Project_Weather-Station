@@ -8,153 +8,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <link rel="stylesheet" href="style.css">
+    
     <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
-
-    <style>
-        :root {
-            --bg-main: #0B131E;
-            --bg-panel: #202B3B;
-            --text-main: #FFFFFF;
-            --text-muted: #A0A5B1;
-            --accent-blue: #00A3FF;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        body {
-            background-color: #161a23; 
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            color: var(--text-main);
-        }
-
-        /* Container Utama Dashboard */
-        .dashboard {
-            background-color: var(--bg-main);
-            width: 95%;
-            max-width: 1200px;
-            height: 90vh;
-            border-radius: 30px;
-            display: flex;
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            gap: 20px;
-        }
-
-        /* --- KONTEN TENGAH --- */
-        .main-content {
-            flex: 2;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        /* Header Pencarian / Judul */
-        .search-bar {
-            background-color: var(--bg-panel);
-            padding: 15px 20px;
-            border-radius: 15px;
-            color: var(--text-main);
-            font-size: 14px;
-        }
-
-        /* Card Cuaca Utama (Hero) */
-        .hero-card {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 40px;
-        }
-        .city-name { font-size: 32px; font-weight: 700; }
-        .chance-rain { font-size: 14px; color: var(--text-muted); }
-        .main-temp { font-size: 80px; font-weight: 700; margin-top: 10px; }
-        .sun-icon { font-size: 100px; color: #FDB813; text-shadow: 0 0 30px rgba(253, 184, 19, 0.4); }
-
-        /* Card Kondisi Lingkungan (Grid 2x2) */
-        .air-conditions {
-            background-color: var(--bg-panel);
-            border-radius: 20px;
-            padding: 30px;
-            flex: 1;
-        }
-        .section-title {
-            font-size: 12px;
-            color: var(--text-muted);
-            font-weight: 600;
-            letter-spacing: 1px;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-        }
-        .grid-conditions {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-        }
-        .condition-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .condition-icon {
-            font-size: 24px;
-            color: var(--text-muted);
-        }
-        .condition-info .label {
-            font-size: 14px;
-            color: var(--text-muted);
-            display: block;
-        }
-        .condition-info .value {
-            font-size: 24px;
-            font-weight: 600;
-        }
-        
-        /* Pewarnaan khusus status kipas */
-        .fan-on { color: #00E676 !important; }
-        .fan-off { color: #FF1744 !important; }
-
-        /* --- SIDEBAR KANAN (ESTETIKA) --- */
-        .right-sidebar {
-            flex: 1;
-            background-color: var(--bg-panel);
-            border-radius: 20px;
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-        }
-        .forecast-list {
-            list-style: none;
-            margin-top: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-        }
-        .forecast-list li {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 14px;
-            color: var(--text-muted);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            padding-bottom: 15px;
-        }
-    </style>
 </head>
 <body>
 
     <div class="dashboard">
-
         <div class="main-content">
-            <div class="search-bar">
-                Monitoring Stasiun Cuaca ESP32
-            </div>
+            <div class="search-bar">Monitoring Stasiun Cuaca ESP32</div>
 
             <div class="hero-card">
                 <div>
@@ -162,9 +24,7 @@
                     <div class="chance-rain">Real-time Data Node</div>
                     <div class="main-temp"><span id="suhu">--</span>&deg;</div>
                 </div>
-                <div class="sun-icon">
-                    <i class="fas fa-sun"></i>
-                </div>
+                <div class="sun-icon"><i class="fas fa-sun"></i></div>
             </div>
 
             <div class="air-conditions">
@@ -200,6 +60,12 @@
                         <div class="condition-info">
                             <span class="label">Status Kipas Aktuator</span>
                             <span class="value" id="kipas">--</span>
+                            
+                            <div class="control-group">
+                                <button class="control-btn btn-active" id="btn-auto" onclick="kirimPerintah('AUTO')">Auto</button>
+                                <button class="control-btn" id="btn-on" onclick="kirimPerintah('ON')">On</button>
+                                <button class="control-btn" id="btn-off" onclick="kirimPerintah('OFF')">Off</button>
+                            </div>
                         </div>
                     </div>
 
@@ -217,14 +83,12 @@
                 <li><span>Relay Module</span> <i class="fas fa-bolt" style="color:orange"></i> <span>Standby</span></li>
             </ul>
         </div>
-
     </div>
 
     <script>
         const mqttKey = "uas-cuaca";      
         const mqttSecret = "6c0283NBx54lgA0b";   
         const clientId = "WebClientUI_" + Math.random().toString(16).substr(2, 8);
-        
         const host = `wss://${mqttKey}:${mqttSecret}@uas-cuaca.cloud.shiftr.io`;
         
         const client = mqtt.connect(host, { clientId: clientId });
@@ -234,12 +98,26 @@
             client.subscribe('uas/cuaca/#');
         });
 
+        // Fungsi untuk mengirim perintah dari tombol ke ESP32
+        function kirimPerintah(mode) {
+            console.log("Mengirim perintah kipas: " + mode);
+            client.publish('uas/cuaca/kendali_kipas', mode);
+
+            // Ubah gaya visual tombol (warna biru penanda aktif)
+            document.getElementById('btn-auto').classList.remove('btn-active');
+            document.getElementById('btn-on').classList.remove('btn-active');
+            document.getElementById('btn-off').classList.remove('btn-active');
+            
+            if (mode === 'AUTO') document.getElementById('btn-auto').classList.add('btn-active');
+            if (mode === 'ON') document.getElementById('btn-on').classList.add('btn-active');
+            if (mode === 'OFF') document.getElementById('btn-off').classList.add('btn-active');
+        }
+
         client.on('message', function (topic, message) {
             const payload = message.toString();
 
             if (topic === 'uas/cuaca/suhu') {
-                const suhuBulat = parseFloat(payload).toFixed(1);
-                document.getElementById('suhu').innerText = suhuBulat;
+                document.getElementById('suhu').innerText = parseFloat(payload).toFixed(1);
             } 
             else if (topic === 'uas/cuaca/kelembapan') {
                 document.getElementById('kelembapan').innerText = parseFloat(payload).toFixed(1) + " %";
@@ -254,7 +132,7 @@
                 const kipasEl = document.getElementById('kipas');
                 kipasEl.innerText = payload;
                 
-                if(payload === "ON") {
+                if(payload.includes("ON")) {
                     kipasEl.className = "value fan-on";
                 } else {
                     kipasEl.className = "value fan-off";
@@ -263,4 +141,4 @@
         });
     </script>
 </body>
-</html>     
+</html>
