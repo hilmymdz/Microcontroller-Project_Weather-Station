@@ -43,11 +43,3 @@ Pastikan kamu telah menginstal *library* berikut di Arduino IDE:
 - `Adafruit BMP280 Library` oleh Adafruit
 - `BH1750` oleh Christopher Laws
 
-## 🚀 Cara Instalasi & Penggunaan
-
-### 1. Konfigurasi ESP32
-1. Buka file `arduino_code.ino` (atau nama file Arduino-mu) di Arduino IDE.
-2. Ubah kredensial Wi-Fi sesuai dengan jaringanmu:
-   ```cpp
-   const char* ssid = "NAMA_WIFI_KAMU";         
-   const char* password = "PASSWORD_WIFI";
